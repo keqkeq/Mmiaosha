@@ -7,9 +7,11 @@ public interface UserDOMapper {
 
     int insert(UserDO record);
 
-    int insertSelective(UserDO record);
+    int  insertSelective(UserDO record);
 
     UserDO selectByPrimaryKey(Integer id);
+
+    UserDO selectByTelphone(String telphone);
 
     int updateByPrimaryKeySelective(UserDO record);
 
