@@ -14,12 +14,12 @@
     id, name, gender, age, telphone, register_mode, third_party_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from user_info
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <select id="selectByTelphone" parameterType="java.lang.String" resultMap="BaseResultMap" resultType="com.miaoshaproject.dataobject.UserDO">
+  <select id="selectByTelphone" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from user_info
@@ -30,12 +30,12 @@
     delete from user_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.miaoshaproject.dataobject.UserDO">
-    insert into user_info (id, name, gender, 
-      age, telphone, register_mode, 
+  <insert id="insert" parameterType="com.miaoshaproject.dataobject.UserDO" useGeneratedKeys="true" keyProperty="id">
+    insert into user_info (id, name, gender,
+      age, telphone, register_mode,
       third_party_id)
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=TINYINT}, 
-      #{age,jdbcType=INTEGER}, #{telphone,jdbcType=VARCHAR}, #{registerMode,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=TINYINT},
+      #{age,jdbcType=INTEGER}, #{telphone,jdbcType=VARCHAR}, #{registerMode,jdbcType=VARCHAR},
       #{thirdPartyId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true" parameterType="com.miaoshaproject.dataobject.UserDO">
