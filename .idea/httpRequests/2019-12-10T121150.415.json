@@ -1,0 +1,7 @@
+{
+  "timestamp": "2019-12-09T16:11:49.915+0000",
+  "status": 415,
+  "error": "Unsupported Media Type",
+  "message": "Content type '*/*;charset=UTF-8' not supported",
+  "path": "/order/createorder"
+}

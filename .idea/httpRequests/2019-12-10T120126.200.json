@@ -1,0 +1,7 @@
+{
+  "status": "fail",
+  "data": {
+    "errCode": 20003,
+    "errMsg": "用户还未登陆,不能下单"
+  }
+}

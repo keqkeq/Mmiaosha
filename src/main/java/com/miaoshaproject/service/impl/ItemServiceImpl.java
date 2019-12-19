@@ -8,9 +8,12 @@ import com.miaoshaproject.dataobject.ItemStockDO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.service.ItemService;
+import com.miaoshaproject.service.PromoService;
 import com.miaoshaproject.service.model.ItemModel;
+import com.miaoshaproject.service.model.PromoModel;
 import com.miaoshaproject.validator.ValidationResult;
 import com.miaoshaproject.validator.ValidatorImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.image.BufferStrategy;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +41,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemStockDOMapper itemStockDOMapper;
+
+    @Autowired
+    private PromoService promoService;
 
     //将ItemModel转换为ItemDO
     private ItemDO convertItemDOFromItemModel(ItemModel itemModel){
@@ -99,6 +106,26 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public List<ItemModel> searchListItem(String likeItemName) throws BusinessException {
+        if(likeItemName==null|likeItemName.isEmpty()){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+
+        //获取跟查找名类似的信息
+        List<ItemModel> itemModelList = listItem();
+        List<ItemModel> result = new ArrayList<>();
+        for (ItemModel itemModel: itemModelList
+             ) {
+            if(itemModel.getTitle().contains(likeItemName)
+                    ||itemModel.getTitle().equals(likeItemName)
+                    ||listItem().contains(itemModel.getTitle())){
+                result.add(itemModel);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public ItemModel getItemById(Integer id) {
         ItemDO itemDO = itemDOMapper.selectByPrimaryKey(id);
         if(itemDO == null){
@@ -109,7 +136,35 @@ public class ItemServiceImpl implements ItemService {
 
         //将dataobject->model
         ItemModel itemModel = convertModelFromDataObject(itemDO,itemStockDO);
+
+        //获取活动商品信息
+        PromoModel promoModel = promoService.getPromoByItemId(itemModel.getId());
+        if(promoModel != null&&promoModel.getStatus().intValue()!=3){
+            itemModel.setPromoModel(promoModel);
+        }
+
         return  itemModel;
+    }
+
+    @Override
+    @Transactional
+    public boolean decreaseStock(Integer itemId, Integer amount) throws BusinessException {
+        //影响为1或者0
+        int affectedRow = itemStockDOMapper.decreaseStock(itemId,amount);
+        if(affectedRow > 0){
+            //更新库存成功
+            return true;
+        }else{
+            //更新库存失败
+            return false;
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public void increaseSales(Integer itemId, Integer amount) throws BusinessException {
+        itemDOMapper.increaseSales(itemId,amount);
     }
 
     private ItemModel convertModelFromDataObject(ItemDO itemDO,ItemStockDO itemStockDO){

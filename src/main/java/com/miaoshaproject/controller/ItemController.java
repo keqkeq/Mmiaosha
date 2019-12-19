@@ -5,6 +5,8 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.ItemService;
 import com.miaoshaproject.service.model.ItemModel;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -73,6 +75,26 @@ public class ItemController extends BaseController {
         return  CommonReturnType.create(itemVOList);
     }
 
+    //商品搜索页面
+    @RequestMapping(value = "/search",method = {RequestMethod.GET})
+    @ResponseBody
+    public CommonReturnType searchListItem(@RequestParam(name = "likeItemName")String likeItemName) throws BusinessException {
+        List<ItemModel> itemModelList = itemService.searchListItem(likeItemName);
+
+        if(itemModelList.isEmpty()||itemModelList ==null){
+            return CommonReturnType.create("小主，没有找到相关商品哦！");
+        }
+        //使用stream api将list内的itemModel转换为ItemVO的list
+        List<ItemVO> itemVOList =  itemModelList.stream().map(itemModel -> {
+            ItemVO itemVO = this.convertVOFromModel(itemModel);
+            return itemVO;
+        }).collect(Collectors.toList());
+
+        return  CommonReturnType.create(itemVOList);
+    }
+
+
+
     /**
      * 对于dataobject -> model -> VO 分层是必须的
      *
@@ -85,6 +107,17 @@ public class ItemController extends BaseController {
         }
         ItemVO itemVO = new ItemVO();
         BeanUtils.copyProperties(itemModel,itemVO);
+
+        if(itemModel.getPromoModel()!=null){
+            //有正在进行的
+            itemVO.setPromoStatus(itemModel.getPromoModel().getStatus());
+            itemVO.setStartDate(itemModel.getPromoModel().getStartDate().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+            itemVO.setPromoId(itemModel.getPromoModel().getId());
+            itemVO.setPromoPrice(itemModel.getPromoModel().getPromoItemPrice());
+        }else {
+            itemVO.setPromoStatus(0);
+        }
+
         return itemVO;
     }
 

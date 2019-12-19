@@ -11,11 +11,11 @@
 
 <body class="login">
 	<div class="content">
-		<h3 class="form-title">用户登陆</h3>
+		<h3 class="form-title">管理员登录</h3>
 		<div class="form-group">
-			<label class="control-label">手机号</label>
+			<label class="control-label">账号</label>
 			<div>
-				<input class="form-control" type="text" placeholder="手机号" name="telphone" id="telphone">
+				<input class="form-control" type="text" placeholder="管理员账号" name="account" id="account">
 			</div>
 		</div>
 		
@@ -30,9 +30,6 @@
 			<button class="btn blue" id="login" type="submit">
 				登陆
 			</button>
-			<button class="btn green" id="register" type="submit">
-				注册
-			</button>
 		<div>
 		
 		
@@ -43,17 +40,15 @@
 <script>
 	jQuery(document).ready(function(){
 	
-		$("#register").on("click",function(){
-			window.location.href="./getotp.html"
-		});
+
 		
 		//绑定otp的click时间用于向后端发送获取手机验证码
 		$("#login").on("click",function(){
-			var telphone = $("#telphone").val();
+			var account = $("#account").val();
 			var password = $("#password").val();
 			
-			if(telphone == null || telphone == ""){
-				alert("手机号不能为空");
+			if(account == null || account == ""){
+				alert("账号不能为空");
 				return false;
 			}
 			if(password == null || password == ""){
@@ -64,9 +59,9 @@
 			$.ajax({
 				type:"POST",
 				contentType:"application/x-www-form-urlencoded",
-				url:"http://localhost:8090/user/login",
+				url:"http://47.106.192.131:8090/admin/login",
 				data:{
-					"telphone":$("#telphone").val(),
+					"account":$("#account").val(),
 					"password":password,
 					
 				},
@@ -74,6 +69,7 @@
 				success:function(data){
 					if(data.status == "success"){
 						alert("登陆成功");
+						window.location.href="./createitem.html";
 					}else{
 						alert("登陆失败，原因为"+data.data.errMsg);
 					}

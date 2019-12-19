@@ -35,6 +35,9 @@ public class ItemModel {
     //商品的销量
     private Integer sales;
 
+    //使用聚合模型,如果promoModel不为空，表示其拥有还未结束的秒杀活动
+    private PromoModel promoModel;
+
     //商品的销量
     @NotBlank(message = "商品图片信息不能为空")
     private String imgUrl;
@@ -94,5 +97,13 @@ public class ItemModel {
 
     public void setSales(Integer sales) {
         this.sales = sales;
+    }
+
+    public PromoModel getPromoModel() {
+        return promoModel;
+    }
+
+    public void setPromoModel(PromoModel promoModel) {
+        this.promoModel = promoModel;
     }
 }
